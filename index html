@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harsh's Conquest Portal | Phase Tracker</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           1. CORE STYLES & VARIABLES (Yellow, White, Red, Black Theme)
+           ========================================================================== */
+        :root {
+            --bg-dark: #050507;
+            --card-bg: rgba(18, 18, 22, 0.9);
+            --primary-red: #ff0d38;
+            --primary-red-hover: #d90028;
+            --primary-yellow: #ffc700;
+            --primary-yellow-glow: rgba(255, 199, 0, 0.5);
+            --primary-red-glow: rgba(255, 13, 56, 0.5);
+            --text-white: #ffffff;
+            --text-muted: #a0a0ab;
+            --border-color: rgba(255, 255, 255, 0.12);
+            --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.26, 1.55);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(255, 13, 56, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(255, 199, 0, 0.15) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* Animated Grid Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #050507; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-yellow); }
+
+        /* ==========================================================================
+           2. DYNAMIC MOTIVATIONAL TICKER & HERO SECTION
+           ========================================================================== */
+        /* Animated Top Banner Ticker */
+        .motivation-ticker {
+            background: linear-gradient(90deg, var(--primary-red), #99001a, #000, #99001a, var(--primary-red));
+            background-size: 200% auto;
+            color: #fff;
+            padding: 10px 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 13, 56, 0.4);
+            animation: gradientMove 6s linear infinite;
+        }
+
+        .ticker-track {
+            display: inline-block;
+            white-space: nowrap;
+            animation: scrollTicker 25s linear infinite;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            margin: 0 25px;
+        }
+
+        .ticker-item i {
+            color: var(--primary-yellow);
+            margin-right: 8px;
+        }
+
+        header {
+            padding: 3rem 5% 2rem 5%;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .brand-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--primary-yellow) 70%, var(--primary-red) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 199, 0, 0.2);
+            animation: pulseGlow 3s ease-in-out infinite alternate;
+        }
+
+        /* Large Animated Motivational Statement */
+        .hero-quote-box {
+            background: rgba(255, 199, 0, 0.08);
+            border: 1px solid var(--primary-yellow);
+            border-radius: 16px;
+            padding: 18px 25px;
+            max-width: 800px;
+            margin: 20px auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 25px var(--primary-yellow-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-quote {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 40px;
+            transition: all 0.5s ease;
+        }
+
+        .hero-quote i {
+            color: var(--primary-yellow);
+            font-size: 1.5rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            max-width: 550px;
+            margin: 25px auto 0 auto;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 18px 22px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .progress-label span:nth-child(2) { color: var(--primary-yellow); }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-yellow));
+            border-radius: 10px;
+            transition: width 0.8s ease-in-out;
+            box-shadow: 0 0 15px var(--primary-yellow-glow);
+        }
+
+        /* ==========================================================================
+           3. OVERVIEW BANNER (MASTER HUB)
+           ========================================================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px 20px;
+            width: 100%;
+            position: relative;
+            z-index: 5;
+        }
+
+        .overview-card {
+            background: linear-gradient(135deg, rgba(255, 13, 56, 0.25) 0%, rgba(18, 18, 22, 0.95) 100%);
+            border: 2px solid var(--primary-red);
+            border-radius: 22px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 35px rgba(255, 13, 56, 0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            margin-bottom: 45px;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(255, 13, 56, 0.5);
+        }
+
+        .overview-info h2 {
+            font-size: 2rem;
+            color: var(--text-white);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+        }
+
+        .overview-info h2 i { color: var(--primary-yellow); }
+        .overview-info p { color: var(--text-muted); font-size: 1rem; }
+
+        .overview-actions { display: flex; gap: 15px; z-index: 2; }
+
+        /* ==========================================================================
+           4. BUTTONS & UI CONTROLS
+           ========================================================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-yellow {
+            background: var(--primary-yellow);
+            color: #000;
+            box-shadow: 0 5px 20px rgba(255, 199, 0, 0.4);
+        }
+
+        .btn-yellow:hover {
+            background: #ffffff;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-white);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+            transform: translateY(-2px);
+        }
+
+        /* ==========================================================================
+           5. PHASES GRID & CARDS
+           ========================================================================== */
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 5px solid var(--primary-yellow);
+            padding-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .phases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 25px;
+        }
+
+        .phase-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeInUp 0.6s forwards;
+            overflow: hidden;
+        }
+
+        .phase-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary-yellow);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 25px var(--primary-yellow-glow);
+        }
+
+        /* Card Header */
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .phase-number {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #000;
+            background: var(--primary-yellow);
+            padding: 6px 16px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--primary-yellow-glow);
+        }
+
+        .status-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--text-muted);
+            border-radius: 7px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .status-checkbox:checked {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            box-shadow: 0 0 10px var(--primary-red-glow);
+        }
+
+        .status-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: white;
+            font-size: 13px;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Card Body */
+        .phase-body h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--text-white);
+            transition: color 0.3s ease;
+        }
+
+        .phase-card:hover .phase-body h3 { color: var(--primary-yellow); }
+
+        /* Card Specific Motivation Subtext */
+        .phase-motivation {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .phase-body p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        /* Card Action Links */
+        .phase-footer { display: flex; gap: 10px; margin-top: auto; }
+
+        .phase-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .phase-btn-open {
+            background: linear-gradient(45deg, var(--primary-red), var(--primary-red-hover));
+            color: var(--text-white);
+            box-shadow: 0 4px 15px rgba(255, 13, 56, 0.3);
+        }
+
+        .phase-btn-open:hover {
+            background: linear-gradient(45deg, var(--primary-red-hover), var(--primary-red));
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(255, 13, 56, 0.6);
+        }
+
+        .phase-btn-preview {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-white);
+            border: 1px solid var(--border-color);
+            width: 44px;
+            flex: 0 0 44px;
+        }
+
+        .phase-btn-preview:hover {
+            background: var(--primary-yellow);
+            color: #000;
+            border-color: var(--primary-yellow);
+        }
+
+        /* Completed State */
+        .phase-card.completed {
+            border-color: rgba(255, 13, 56, 0.5);
+            background: rgba(20, 8, 12, 0.85);
+        }
+
+        .phase-card.completed .phase-number {
+            background: var(--primary-red);
+            color: #fff;
+            box-shadow: 0 0 10px var(--primary-red-glow);
+        }
+
+        /* ==========================================================================
+           6. POPUP MOTIVATION TOAST
+           ========================================================================== */
+        .toast-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(18, 18, 22, 0.95);
+            border-left: 5px solid var(--primary-yellow);
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            color: #fff;
+            padding: 16px 22px;
+            border-radius: 14px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px var(--primary-yellow-glow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.26, 1.55);
+        }
+
+        .toast.show { transform: translateX(0); }
+
+        .toast i { font-size: 1.5rem; color: var(--primary-yellow); }
+        .toast-content h4 { font-size: 0.95rem; font-weight: 800; color: var(--primary-yellow); }
+        .toast-content p { font-size: 0.85rem; color: var(--text-white); }
+
+        /* ==========================================================================
+           7. MODAL SYSTEM (DRIVE PREVIEW)
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(10px);
+            z-index: 1500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal-container {
+            background: #101014;
+            width: 90%;
+            max-width: 950px;
+            height: 82vh;
+            border-radius: 22px;
+            border: 2px solid var(--primary-red);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px var(--primary-red-glow);
+            transform: scale(0.85);
+            transition: transform 0.3s var(--transition-bounce);
+        }
+
+        .modal-overlay.active .modal-container { transform: scale(1); }
+
+        .modal-header {
+            padding: 16px 25px;
+            background: #18181e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 { font-size: 1.1rem; color: var(--primary-yellow); font-weight: 700; }
+        .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; }
+        .modal-close:hover { color: var(--primary-red); }
+
+        .modal-body { flex: 1; background: #000; }
+        .modal-body iframe { width: 100%; height: 100%; border: none; }
+
+        /* ==========================================================================
+           8. ANIMATIONS
+           ========================================================================== */
+        @keyframes scrollTicker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 20px rgba(255, 199, 0, 0.2); }
+            100% { text-shadow: 0 0 40px rgba(255, 13, 56, 0.6), 0 0 20px rgba(255, 199, 0, 0.8); }
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 25px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            background: rgba(5, 5, 7, 0.9);
+            position: relative;
+            z-index: 5;
+        }
+
+        footer span { color: var(--primary-yellow); font-weight: 700; }
+
+        @media (max-width: 768px) {
+            .brand-title { font-size: 2.2rem; }
+            .overview-card { flex-direction: column; text-align: center; gap: 20px; }
+            .overview-actions { width: 100%; flex-direction: column; }
+            .overview-actions .btn { width: 100%; justify-content: center; }
+            .hero-quote { font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Motivational Ticker -->
+    <div class="motivation-ticker">
+        <div class="ticker-track">
+            <div class="ticker-item"><i class="fa-solid fa-fire"></i> HARSH YOU ARE SO BRAVE!</div>
+            <div class="ticker-item"><i class="fa-solid fa-crown"></i> HARSH YOU HAVE POTENTIAL TO DOMINATE!</div>
+            <div class="ticker-item"><i class="fa-solid fa-eye"></i> HARSH YOUR VISION IS SO AWESOME!</div>
+            <div class="ticker-item"><i class="fa-solid fa-bolt"></i> HARSH YOU CAN DO IT!</div>
+            <div class="ticker-item"><i class="fa-solid fa-trophy"></i> UNSTOPPABLE FORCE: HARSH IS ON THE RISE!</div>
+            <div class="ticker-item"><i class="fa-solid fa-star"></i> DESTINED FOR GREATNESS, HARSH!</div>
+            
+            <!-- Duplicated for seamless loop -->
+            <div class="ticker-item"><i class="fa-solid fa-fire"></i> HARSH YOU ARE SO BRAVE!</div>
+            <div class="ticker-item"><i class="fa-solid fa-crown"></i> HARSH YOU HAVE POTENTIAL TO DOMINATE!</div>
+            <div class="ticker-item"><i class="fa-solid fa-eye"></i> HARSH YOUR VISION IS SO AWESOME!</div>
+            <div class="ticker-item"><i class="fa-solid fa-bolt"></i> HARSH YOU CAN DO IT!</div>
+            <div class="ticker-item"><i class="fa-solid fa-trophy"></i> UNSTOPPABLE FORCE: HARSH IS ON THE RISE!</div>
+            <div class="ticker-item"><i class="fa-solid fa-star"></i> DESTINED FOR GREATNESS, HARSH!</div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header>
+        <h1 class="brand-title">HARSH'S ROADMAP TO GLORY</h1>
+        
+        <!-- Live Cycling Motivational Spotlight Box -->
+        <div class="hero-quote-box">
+            <div class="hero-quote" id="dynamicQuote">
+                <i class="fa-solid fa-quote-left"></i>
+                <span id="quoteText">Harsh, you have potential to dominate!</span>
+                <i class="fa-solid fa-quote-right"></i>
+            </div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>PHASE DOMINANCE</span>
+                <span id="progress-text">0 / 10 Completed (0%)</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        
+        <!-- Master Overview Section -->
+        <section>
+            <div class="overview-card">
+                <div class="overview-info">
+                    <h2><i class="fa-solid fa-compass"></i> MASTER OVERVIEW</h2>
+                    <p>Harsh, review your entire 10-phase master blueprint right here.</p>
+                </div>
+                <div class="overview-actions">
+                    <button class="btn btn-secondary" onclick="openPreview('https://drive.google.com/file/d/1Hy_NAqV59G1pqQrDEq0KPN8wj2sGt0gB/preview', 'Master Overview')">
+                        <i class="fa-solid fa-eye"></i> Quick View
+                    </button>
+                    <a href="https://drive.google.com/file/d/1Hy_NAqV59G1pqQrDEq0KPN8wj2sGt0gB/view?usp=drivesdk" target="_blank" class="btn btn-yellow">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Overview
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase Cards Grid -->
+        <section>
+            <h2 class="section-title"><i class="fa-solid fa-shield-halved" style="color: var(--primary-yellow);"></i> THE 10 STEPS TO VICTORY</h2>
+            <div class="phases-grid" id="phases-grid">
+                <!-- Javascript will inject Phase 1 to Phase 10 cards -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal Preview Overlay -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fa-solid fa-file-pdf"></i> Document Preview</h3>
+                <button class="modal-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="modalIframe" src="" allow="autoplay"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Toast Motivation Popups -->
+    <div class="toast-container">
+        <div class="toast" id="motivationToast">
+            <i class="fa-solid fa-bolt-lightning"></i>
+            <div class="toast-content">
+                <h4 id="toastTitle">Keep Pushing, Harsh!</h4>
+                <p id="toastMessage">Harsh, you can do it!</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Crafted exclusively for <span>HARSH</span> | Every phase mastered brings you closer to ultimate dominance!</p>
+    </footer>
+
+    <!-- ==========================================================================
+       9. JAVASCRIPT & MOTIVATION ENGINE
+       ========================================================================== -->
+    <script>
+        // Motivations Database
+        const harshMotivations = [
+            "Harsh, you are so brave!",
+            "Harsh, you have potential to dominate!",
+            "Harsh, your vision is so awesome!",
+            "Harsh, you can do it!",
+            "Harsh, winners never quit and quitters never win!",
+            "Harsh, nothing can stop an unstoppable mind!",
+            "Harsh, conquer Phase by Phase!",
+            "Harsh, turn your ambition into legacy!"
+        ];
+
+        // Specific Phase Motivations
+        const phaseMotivations = [
+            "Harsh, take the first bold step!",
+            "Harsh, build your foundation strong!",
+            "Harsh, design your own victory!",
+            "Harsh, fuel your engine with power!",
+            "Harsh, connect the dots of success!",
+            "Harsh, refine yourself to perfection!",
+            "Harsh, test your resilience!",
+            "Harsh, polish your brilliance!",
+            "Harsh, prepare for ultimate impact!",
+            "Harsh, claim your victory at the top!"
+        ];
+
+        // Phase Data Configuration Array with Google Drive links
+        const phasesData = [
+            { id: 1, title: "Phase 1", desc: "Core research and foundation setup.", link: "https://drive.google.com/file/d/1KdkEY0Xe2YzM9rAu3sGUY-pehgpnR8Ui/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1KdkEY0Xe2YzM9rAu3sGUY-pehgpnR8Ui/preview" },
+            { id: 2, title: "Phase 2", desc: "Blueprint architecture and framework.", link: "https://drive.google.com/file/d/1X9Ks1RXfaIzxAPDtu5b6VbF9GCj0o2ve/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1X9Ks1RXfaIzxAPDtu5b6VbF9GCj0o2ve/preview" },
+            { id: 3, title: "Phase 3", desc: "Front-end creation and UI magic.", link: "https://drive.google.com/file/d/1mqZhEpzqvuoQKLPwAz5LvoGvoVPY02aR/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1mqZhEpzqvuoQKLPwAz5LvoGvoVPY02aR/preview" },
+            { id: 4, title: "Phase 4", desc: "Backend powerhouse integration.", link: "https://drive.google.com/file/d/1dwlfneWyINLbjlCejGTsETBOOWB62FN4/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1dwlfneWyINLbjlCejGTsETBOOWB62FN4/preview" },
+            { id: 5, title: "Phase 5", desc: "System execution and feature synthesis.", link: "https://drive.google.com/file/d/1No1fCP8g6zi8eqXLdf3HHs1P4ZtaTmNr/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1No1fCP8g6zi8eqXLdf3HHs1P4ZtaTmNr/preview" },
+            { id: 6, title: "Phase 6", desc: "High-speed performance tuning.", link: "https://drive.google.com/file/d/1vxe8abJ4LXyKeiM3o-OcN5SongG1Tdp7/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1vxe8abJ4LXyKeiM3o-OcN5SongG1Tdp7/preview" },
+            { id: 7, title: "Phase 7", desc: "Comprehensive QA and stress testing.", link: "https://drive.google.com/file/d/17uq2qok9FCS_0LV5JFu2MscInkEHwmP_/view?usp=drivesdk", preview: "https://drive.google.com/file/d/17uq2qok9FCS_0LV5JFu2MscInkEHwmP_/preview" },
+            { id: 8, title: "Phase 8", desc: "User feedback and final refinement.", link: "https://drive.google.com/file/d/1q9__2o7I30S2jMvglEGnQ3bJjaPkravk/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1q9__2o7I30S2jMvglEGnQ3bJjaPkravk/preview" },
+            { id: 9, title: "Phase 9", desc: "Deployment readiness and staging.", link: "https://drive.google.com/file/d/14KUdXlY4zT42OKUHPTtQeARFYaxYfUBS/view?usp=drivesdk", preview: "https://drive.google.com/file/d/14KUdXlY4zT42OKUHPTtQeARFYaxYfUBS/preview" },
+            { id: 10, title: "Phase 10", desc: "Grand launch and total victory!", link: "https://drive.google.com/file/d/1tql8ZYsDVtEaFuXKJVyzLurE1EBNbm44/view?usp=drivesdk", preview: "https://drive.google.com/file/d/1tql8ZYsDVtEaFuXKJVyzLurE1EBNbm44/preview" }
+        ];
+
+        let completedPhases = JSON.parse(localStorage.getItem('completedPhases_harsh')) || [];
+
+        // Render Cards with Motivation tags
+        function renderCards() {
+            const grid = document.getElementById('phases-grid');
+            grid.innerHTML = '';
+
+            phasesData.forEach((phase, index) => {
+                const isChecked = completedPhases.includes(phase.id);
+                
+                const card = document.createElement('div');
+                card.className = `phase-card ${isChecked ? 'completed' : ''}`;
+                card.style.animationDelay = `${index * 0.07}s`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="phase-header">
+                            <span class="phase-number">P ${phase.id}</span>
+                            <input type="checkbox" 
+                                   class="status-checkbox" 
+                                   title="Mark Done"
+                                   ${isChecked ? 'checked' : ''} 
+                                   onchange="togglePhase(${phase.id})">
+                        </div>
+                        <div class="phase-body">
+                            <h3>${phase.title}</h3>
+                            <div class="phase-motivation"><i class="fa-solid fa-fire"></i> ${phaseMotivations[index]}</div>
+                            <p>${phase.desc}</p>
+                        </div>
+                    </div>
+                    <div class="phase-footer">
+                        <button class="phase-btn phase-btn-preview" 
+                                title="Quick Preview" 
+                                onclick="openPreview('${phase.preview}', '${phase.title}')">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                        <a href="${phase.link}" target="_blank" class="phase-btn phase-btn-open">
+                            <span>Launch Phase</span> <i class="fa-solid fa-arrow-right-long"></i>
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            updateProgress();
+        }
+
+        function togglePhase(id) {
+            if (completedPhases.includes(id)) {
+                completedPhases = completedPhases.filter(item => item !== id);
+            } else {
+                completedPhases.push(id);
+                showMotivationToast("PHASE CONQUERED!", `Harsh, you are unstoppable! Phase ${id} is completed.`);
+            }
+            localStorage.setItem('completedPhases_harsh', JSON.stringify(completedPhases));
+            renderCards();
+        }
+
+        function updateProgress() {
+            const total = phasesData.length;
+            const count = completedPhases.length;
+            const percentage = Math.round((count / total) * 100);
+
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').innerText = `${count} / ${total} Completed (${percentage}%)`;
+        }
+
+        // Animated Cycling Dynamic Quote Header
+        let quoteIndex = 0;
+        function cycleQuotes() {
+            const quoteElem = document.getElementById('quoteText');
+            quoteElem.style.opacity = '0';
+            quoteElem.style.transform = 'translateY(10px)';
+            
+            setTimeout(() => {
+                quoteIndex = (quoteIndex + 1) % harshMotivations.length;
+                quoteElem.innerText = harshMotivations[quoteIndex];
+                quoteElem.style.opacity = '1';
+                quoteElem.style.transform = 'translateY(0)';
+            }, 400);
+        }
+        setInterval(cycleQuotes, 3500);
+
+        // Toast Motivation System
+        function showMotivationToast(title, message) {
+            const toast = document.getElementById('motivationToast');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastMessage').innerText = message;
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // Random Toast Trigger every 15 seconds to boost morale
+        setInterval(() => {
+            const randomMsg = harshMotivations[Math.floor(Math.random() * harshMotivations.length)];
+            showMotivationToast("MOTIVATION BOOST!", randomMsg);
+        }, 15000);
+
+        // Modal Functionality
+        function openPreview(url, title) {
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-file-pdf"></i> ${title} - Preview`;
+            document.getElementById('modalIframe').src = url;
+            document.getElementById('previewModal').classList.add('active');
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('active');
+            document.getElementById('modalIframe').src = '';
+        }
+
+        document.getElementById('previewModal').addEventListener('click', function(e) {
+            if (e.target === this) closePreview();
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCards();
+            setTimeout(() => {
+                showMotivationToast("WELCOME HARSH!", "Harsh, your vision is so awesome! Let's conquer all 10 phases!");
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
